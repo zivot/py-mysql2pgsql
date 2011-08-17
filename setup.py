@@ -14,7 +14,7 @@ setup(
     name='py-mysql2pgsql',
     version='0.1.0',
     description='Tool for migrating/converting from mysql to postgresql.',
-    long_description=open('README.txt').read(),
+    long_description=open('README.rst').read(),
     license='MIT License',
     author='Philip Southam',
     author_email='philipsoutham@gmail.com',
@@ -26,7 +26,7 @@ setup(
     install_requires=install_requires,
     classifiers=[
         'License :: OSI Approved :: MIT License',
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Developers',

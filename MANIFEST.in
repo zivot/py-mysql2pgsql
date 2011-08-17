@@ -7,5 +7,4 @@ recursive-exclude * *.yml
 recursive-exclude * *.DS_Store
 recursive-exclude * *.coverage
 
-prune docs/_build
 prune tests/reports

@@ -39,9 +39,6 @@ From PyPI:
 All dependencies **should** be automatically installed when installing
 the app the following ways
 
-.. note::
-   I haven't got around to doing this yet, so install from source.
-
 ::
 
     > pip install py-mysql2pgsql
@@ -240,6 +237,6 @@ I ported much of this from an existing project written in Ruby by Max
 Lapshin over at `<https://github.com/maxlapshin/mysql2postgres>`_. I
 found that it worked fine for most things, but for migrating large tables
 with millions of rows it started to break down. This motivated me to
-write :program:`py-mysql2pgsql` which uses a server side cursor, so there is no "paging"
+write *py-mysql2pgsql* which uses a server side cursor, so there is no "paging"
 which means there is no slow down while working it's way through a
 large dataset.
