@@ -1,0 +1,11 @@
+include LICENSE.txt CHANGES.txt 
+recursive-include tests *
+recursive-include docs *
+recursive-exclude * *.pyc
+recursive-exclude * *.pyo
+recursive-exclude * *.yml
+recursive-exclude * *.DS_Store
+recursive-exclude * *.coverage
+
+prune docs/_build
+prune tests/reports

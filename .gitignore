@@ -1,4 +1,5 @@
 .DS_Store
+.coverage
 *.pyc
 *.pyo
 env
@@ -12,3 +13,7 @@ MANIFEST
 .\#*
 *~
 *.egg-info
+*.yaml
+*.yml
+docs/_build
+tests/reports
