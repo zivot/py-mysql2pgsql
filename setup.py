@@ -12,7 +12,7 @@ if os.name == 'posix':
     
 setup(
     name='py-mysql2pgsql',
-    version='0.1.0',
+    version='0.1.1',
     description='Tool for migrating/converting from mysql to postgresql.',
     long_description=open('README.rst').read(),
     license='MIT License',

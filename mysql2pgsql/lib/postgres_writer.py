@@ -124,7 +124,7 @@ class PostgresWriter(Writer):
                 elif 'text[' in column_type:
                     row[index] = '{%s}' % ','.join('"%s"' % v.replace('"', r'\"') for v in row[index].split(','))
                 else:
-                    row[index] = row[index].replace('\\', r'\\\\\\').replace('\n', r'\n').replace('\t', r'\t').replace('\r', r'\r').replace('\0', '')
+                    row[index] = row[index].replace('\\', r'\\').replace('\n', r'\n').replace('\t', r'\t').replace('\r', r'\r').replace('\0', '')
             elif column_type == 'boolean':
                 row[index] = 't' if row[index] == 1 else 'f' if row[index] == 0 else row[index]
             elif row[index].__class__ in (date, datetime):
