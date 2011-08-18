@@ -33,6 +33,18 @@ Requirements:
 * `termcolor <http://pypi.python.org/pypi/termcolor>`_ (unless you're installing on windows)
 
 
+On Windows
+----------
+
+I have only done limited testing on this platform using Python
+2.7. Here are the driver dependencies for windows, install these
+before attempting to install py-mysql2pgsql or it will fail.
+
+* `psycopg2 for Windows <http://www.stickpeople.com/projects/python/win-psycopg/>`_
+* `MySQL-python for Windows <http://www.codegood.com/archives/129>`_
+
+
+
 From PyPI:
 ----------
 

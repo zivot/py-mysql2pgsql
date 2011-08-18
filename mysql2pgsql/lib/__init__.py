@@ -1,33 +1,34 @@
 from __future__ import absolute_import
 
-import os
 import sys
 from functools import wraps
 
 from .mysql_reader import MysqlReader
-
-from termcolor import colored, cprint
+try:
+    from termcolor import colored, cprint
+except ImportError:
+    pass
 
 
 def print_row_progress(val):
-    if os.name == 'posix':
+    try:
         cprint('  %s' % val, 'cyan', end=' ')
-    else:
+    except NameError:
         print('  %s' % val),
     sys.stdout.flush()
 
 
 def print_start_table(val):
-    if os.name == 'posix':
+    try:
         cprint(val, 'magenta')
-    else:
+    except NameError:
         print(val)
 
 
 def print_table_actions(val):
-    if os.name == 'posix':
+    try:
         cprint('  %s' % val, 'green')
-    else:
+    except NameError:
         print('  %s' % val)
 
 
@@ -36,9 +37,9 @@ def find_first(items, func):
 
 
 def print_red(val):
-    if os.name == 'posix':
+    try:
         cprint(val, 'red')
-    else:
+    except NameError:
         print(val)
 
 
