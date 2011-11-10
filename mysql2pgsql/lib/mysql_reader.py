@@ -11,8 +11,8 @@ re_column_length = re.compile(r'\((\d+)\)')
 re_column_precision = re.compile(r'\((\d+),(\d+)\)')
 re_key_1 = re.compile(r'CONSTRAINT `(\w+)` FOREIGN KEY \(`(\w+)`\) REFERENCES `(\w+)` \(`(\w+)`\)')
 re_key_2 = re.compile(r'KEY `(\w+)` \((.*)\)')
-re_key_3 = re.compile(r'PRIMARY KEY .*\((.*)\)')
-
+#re_key_3 = re.compile(r'PRIMARY KEY .*\((.*)\)')
+re_key_3 = re.compile(r'PRIMARY KEY \((.*)\)')
 class DB:
     """
     Class that wraps MySQLdb functions that auto reconnects
@@ -164,7 +164,7 @@ class MysqlReader(object):
                 match_data = re_key_3.search(line)
                 if match_data:
                     index['primary'] = True
-                    index['columns'] = [col.replace('`', '') for col in match_data.group(1).split(',')]
+                    index['columns'] = [re.sub(r'\(\d+\)', '', col.replace('`', '')) for col in match_data.group(1).split(',')]
                     self._indexes.append(index)
                     continue
 
