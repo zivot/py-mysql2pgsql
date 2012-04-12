@@ -21,15 +21,15 @@ class Mysql2Pgsql(object):
             raise e
             
         if self.run_options.timezone:
-            self.file_options.['timezone'] = self.run_options.timezone
+            self.file_options['timezone'] = self.run_options.timezone
 
     def convert(self):
         reader = MysqlReader(self.file_options['mysql'])
 
         if self.file_options['destination']['file']:
-            writer = PostgresFileWriter(self._get_file(self.file_options['destination']['file']), self.run_options.verbose, self.file_options.['timezone'])
+            writer = PostgresFileWriter(self._get_file(self.file_options['destination']['file']), self.run_options.verbose, self.file_options['timezone'])
         else:
-            writer = PostgresDbWriter(self.file_options['destination']['postgres'], self.run_options.verbose, self.file_options.['timezone'])
+            writer = PostgresDbWriter(self.file_options['destination']['postgres'], self.run_options.verbose, self.file_options['timezone'])
 
         Converter(reader, writer, self.file_options, self.run_options.verbose).convert()
 
