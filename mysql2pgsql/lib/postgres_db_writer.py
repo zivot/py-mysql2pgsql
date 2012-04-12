@@ -29,11 +29,12 @@ class PostgresDbWriter(PostgresWriter):
           - `processor`:
           - `verbose`: whether or not to log progress to :py:obj:`stdout`
         """
-        def __init__(self, table, data, processor, verbose=False):
+        def __init__(self, table, data, processor, verbose=False, timezone=False):
             self.data = iter(data)
             self.table = table
             self.processor = processor
             self.verbose = verbose
+            self.timezone = timezone
 
             if verbose:
                 self.idx = 1

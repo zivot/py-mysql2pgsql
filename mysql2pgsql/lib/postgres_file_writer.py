@@ -22,8 +22,9 @@ class PostgresFileWriter(PostgresWriter):
     
     """
     verbose = None
-    def __init__(self, output_file, verbose=False):
+    def __init__(self, output_file, verbose=False, timezone=False):
         self.verbose = verbose
+        self.timezone = timezone
         self.f = output_file
         self.f.write("""
 -- MySQL 2 PostgreSQL dump\n

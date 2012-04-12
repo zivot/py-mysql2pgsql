@@ -73,4 +73,7 @@ supress_ddl: false
 
 # if force_truncate is true, forces a table truncate before table loading
 force_truncate: false
+
+# if timezone is true, forces to append UTC tzinfo
+timezone: false
 """

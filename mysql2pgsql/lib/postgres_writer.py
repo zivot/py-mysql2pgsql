@@ -69,7 +69,10 @@ class PostgresWriter(Writer):
                 return default, 'double precision'
             elif column['type'] == 'datetime':
                 default = None
-                return default, 'timestamp without time zone'
+                if self.timezone:
+                    return default, 'timestamp with time zone'
+                else:
+                    return default, 'timestamp without time zone'
             elif column['type'] == 'date':
                 default = None
                 return default, 'date'
@@ -80,10 +83,16 @@ class PostgresWriter(Writer):
                     default = " DEFAULT '1970-01-01 00:00'"
                 if "0000-00-00 00:00:00" in column['default']:
                     default = " DEFAULT '1970-01-01 00:00:00'"
-                return default, 'timestamp without time zone'
+                if self.timezone:
+                    return default, 'timestamp with time zone'
+                else:
+                    return default, 'timestamp without time zone'
             elif column['type'] == 'time':
                 default = " DEFAULT NOW()" if t(default) else None
-                return default, 'time without time zone'
+                if self.timezone:
+                    return default, 'time with time zone'
+                else:
+                    return default, 'time without time zone'
             elif 'blob' in column['type'] or 'binary' in column['type']:
                 return default, 'bytea'
             elif column['type'] in ('tinytext', 'mediumtext', 'longtext', 'text'):
@@ -115,7 +124,10 @@ class PostgresWriter(Writer):
             if row[index] == None and ('timestamp' not in column_type or not column['default']):
                 row[index] = '\N'
             elif row[index] == None and column['default']:
-                row[index] = '1970-01-01 00:00:00'
+                if timezone:
+                    row[index] = '1970-01-01 00:00:00+00:00'
+                else:
+                    row[index] = '1970-01-01 00:00:00'
             elif 'bit' in column_type:
                 row[index] = bin(ord(row[index]))[2:]
             elif row[index].__class__ in (str, unicode):
@@ -128,7 +140,10 @@ class PostgresWriter(Writer):
             elif column_type == 'boolean':
                 row[index] = 't' if row[index] == 1 else 'f' if row[index] == 0 else row[index]
             elif row[index].__class__ in (date, datetime):
-                row[index] = row[index].isoformat()
+                if timezone and row[index].__class__ == datetime:
+                    row[index] = row[index].isoformat() + '+00:00'
+                else:
+                    row[index] = row[index].isoformat()
             elif row[index].__class__ is timedelta:
                 row[index] = datetime.utcfromtimestamp(row[index].total_seconds()).time().isoformat()
             else:
