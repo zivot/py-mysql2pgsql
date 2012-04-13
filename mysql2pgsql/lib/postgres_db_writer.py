@@ -29,12 +29,11 @@ class PostgresDbWriter(PostgresWriter):
           - `processor`:
           - `verbose`: whether or not to log progress to :py:obj:`stdout`
         """
-        def __init__(self, table, data, processor, verbose=False, timezone=False):
+        def __init__(self, table, data, processor, verbose=False):
             self.data = iter(data)
             self.table = table
             self.processor = processor
             self.verbose = verbose
-            self.timezone = timezone
 
             if verbose:
                 self.idx = 1
@@ -71,8 +70,9 @@ class PostgresDbWriter(PostgresWriter):
             return self.readline(*args, **kwargs)
 
 
-    def __init__(self, db_options, verbose=False):
+    def __init__(self, db_options, verbose=False, timezone=False):
         self.verbose = verbose
+        self.timezone = timezone
         self.db_options = {
             'host': db_options['hostname'],
             'port': db_options.get('port', 5432),
