@@ -22,9 +22,8 @@ class PostgresFileWriter(PostgresWriter):
     
     """
     verbose = None
-    def __init__(self, output_file, verbose=False, timezone=False):
+    def __init__(self, output_file, verbose=False, *args, **kwargs):
         self.verbose = verbose
-        self.timezone = timezone
         self.f = output_file
         self.f.write("""
 -- MySQL 2 PostgreSQL dump\n
@@ -33,6 +32,7 @@ SET standard_conforming_strings = off;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 """)
+        super(PostgresFileWriter, self).__init__(*args, **kwargs)
 
     @status_logger
     def truncate(self, table):

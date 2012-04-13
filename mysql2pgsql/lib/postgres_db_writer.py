@@ -70,9 +70,8 @@ class PostgresDbWriter(PostgresWriter):
             return self.readline(*args, **kwargs)
 
 
-    def __init__(self, db_options, verbose=False, timezone=False):
+    def __init__(self, db_options, verbose=False, *args, **kwargs):
         self.verbose = verbose
-        self.timezone = timezone
         self.db_options = {
             'host': db_options['hostname'],
             'port': db_options.get('port', 5432),
@@ -84,6 +83,7 @@ class PostgresDbWriter(PostgresWriter):
             self.db_options['database'], self.schema  = self.db_options['database'].split(':')
         else:
             self.schema = None
+        super(PostgresDbWriter, self).__init__(*args, **kwargs)
         self.open()
 
     def open(self):
