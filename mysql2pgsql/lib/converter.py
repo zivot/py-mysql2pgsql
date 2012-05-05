@@ -57,13 +57,12 @@ class Converter(object):
 
             for table in tables:
                 self.writer.write_indexes(table)
-            
+
             for table in tables:
                 self.writer.write_constraints(table)
 
             if self.verbose:
                 print_start_table('DONE CREATING INDEXES AND CONSTRAINTS')
-
 
         if self.verbose:
             print_start_table('\n\n>>>>>>>>>> FINISHED <<<<<<<<<<')

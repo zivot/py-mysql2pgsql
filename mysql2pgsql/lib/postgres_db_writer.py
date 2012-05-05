@@ -1,14 +1,13 @@
 from __future__ import with_statement, absolute_import
 
-import sys
 import time
 from contextlib import closing
 
 import psycopg2
-from psycopg2.extensions import QuotedString
 
 from . import print_row_progress, status_logger
 from .postgres_writer import PostgresWriter
+
 
 class PostgresDbWriter(PostgresWriter):
     """Class used to stream DDL and/or data
@@ -69,7 +68,6 @@ class PostgresDbWriter(PostgresWriter):
         def read(self, *args, **kwargs):
             return self.readline(*args, **kwargs)
 
-
     def __init__(self, db_options, verbose=False):
         self.verbose = verbose
         self.db_options = {
@@ -80,7 +78,7 @@ class PostgresDbWriter(PostgresWriter):
             'user': db_options['username'],
             }
         if ':' in db_options['database']:
-            self.db_options['database'], self.schema  = self.db_options['database'].split(':')
+            self.db_options['database'], self.schema = self.db_options['database'].split(':')
         else:
             self.schema = None
         self.open()
@@ -115,7 +113,7 @@ class PostgresDbWriter(PostgresWriter):
                           table=table_name,
                           columns=columns
                           )
-    
+
         self.conn.commit()
 
     def close(self):
@@ -129,7 +127,7 @@ class PostgresDbWriter(PostgresWriter):
     @status_logger
     def truncate(self, table):
         """Send DDL to truncate the specified `table`
-        
+
         :Parameters:
           - `table`: an instance of a :py:class:`mysql2pgsql.lib.mysql_reader.MysqlReader.Table` object that represents the table to read/write.
 
@@ -152,7 +150,7 @@ class PostgresDbWriter(PostgresWriter):
         table_sql, serial_key_sql = super(self.__class__, self).write_table(table)
         for sql in serial_key_sql + table_sql:
             self.execute(sql)
-        
+
     @status_logger
     def write_indexes(self, table):
         """Send DDL to create the specified `table` indexes

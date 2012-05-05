@@ -26,15 +26,14 @@ class PostgresWriter(Writer):
             return 'integer DEFAULT nextval(\'%s_%s_seq\'::regclass) NOT NULL' % (
                    column['table_name'], column['name'])
 
-        
         null = "" if column['null'] else " NOT NULL"
-        
+
         def get_type(column):
             """This in conjunction with :py:class:`mysql2pgsql.lib.mysql_reader.MysqlReader._convert_type`
             determines the PostgreSQL data type. In my opinion this is way too fugly, will need
             to refactor one day.
             """
-            def t(v): return not v == None
+            t = lambda v: not v == None
             default = (' DEFAULT %s' % QuotedString(column['default']).getquoted()) if t(column['default']) else None
 
             if column['type'] == 'char':
@@ -126,7 +125,8 @@ class PostgresWriter(Writer):
                 else:
                     row[index] = row[index].replace('\\', r'\\').replace('\n', r'\n').replace('\t', r'\t').replace('\r', r'\r').replace('\0', '')
             elif column_type == 'boolean':
-                row[index] = 't' if row[index] == 1 else 'f' if row[index] == 0 else row[index]
+                # We got here because you used a tinyint(1), if you didn't want a bool, don't use that type
+                row[index] = 't' if row[index] not in (None, 0) else 'f' if row[index] == 0 else row[index]
             elif row[index].__class__ in (date, datetime):
                 row[index] = row[index].isoformat()
             elif row[index].__class__ is timedelta:
@@ -148,7 +148,6 @@ class PostgresWriter(Writer):
                 primary_keys.append(column['name'])
             columns.write('  %s,\n' % self.column_description(column))
         return primary_keys, serial_key, maxval, columns.getvalue()[:-2]
-
 
     def truncate(self, table):
         serial_key = None
@@ -206,7 +205,7 @@ class PostgresWriter(Writer):
                     'table_name': table.name,
                     'column_names': ', '.join('"%s"' % col for col in index['columns']),
                     })
-        
+
         return index_sql
 
     def write_constraints(self, table):

@@ -1,15 +1,12 @@
 from __future__ import absolute_import
 
 import time
-import sys
 
-from cStringIO import StringIO
-
-from psycopg2.extensions import QuotedString
 
 from .postgres_writer import PostgresWriter
 
 from . import print_row_progress, status_logger
+
 
 class PostgresFileWriter(PostgresWriter):
     """Class used to ouput the PostgreSQL
@@ -19,9 +16,10 @@ class PostgresFileWriter(PostgresWriter):
     :Parameters:
       - `output_file`: the output :py:obj:`file` to send the DDL and/or data
       - `verbose`: whether or not to log progress to :py:obj:`stdout`
-    
+
     """
     verbose = None
+
     def __init__(self, output_file, verbose=False):
         self.verbose = verbose
         self.f = output_file
@@ -65,7 +63,7 @@ SET client_min_messages = warning;
         """
         table_sql, serial_key_sql = super(self.__class__, self).write_table(table)
         if serial_key_sql:
-            self.f.write(""" 
+            self.f.write("""
 %(serial_key_sql)s
 """ % {
     'serial_key_sql': '\n'.join(serial_key_sql)
@@ -119,7 +117,7 @@ SET client_min_messages = warning;
 
         f_write("""
 --
--- Data for Name: %(table_name)s; Type: TABLE DATA; 
+-- Data for Name: %(table_name)s; Type: TABLE DATA;
 --
 
 COPY "%(table_name)s" (%(column_names)s) FROM stdin;

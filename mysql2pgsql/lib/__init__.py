@@ -5,7 +5,7 @@ from functools import wraps
 
 from .mysql_reader import MysqlReader
 try:
-    from termcolor import colored, cprint
+    from termcolor import cprint
 except ImportError:
     pass
 
@@ -89,4 +89,3 @@ def status_logger(f):
         else:
             return f(*args, **kwargs)
     return decorated_function
-
