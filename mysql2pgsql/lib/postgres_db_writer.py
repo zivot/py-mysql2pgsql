@@ -29,7 +29,6 @@ class PostgresDbWriter(PostgresWriter):
           - `verbose`: whether or not to log progress to :py:obj:`stdout`
         """
         def __init__(self, table, data, processor, verbose=False):
-            super(PostgresDbWriter, self).__init__()
             self.data = iter(data)
             self.table = table
             self.processor = processor
@@ -70,6 +69,7 @@ class PostgresDbWriter(PostgresWriter):
             return self.readline(*args, **kwargs)
 
     def __init__(self, db_options, verbose=False):
+        super(PostgresDbWriter, self).__init__()
         self.verbose = verbose
         self.db_options = {
             'host': db_options['hostname'],
@@ -134,7 +134,7 @@ class PostgresDbWriter(PostgresWriter):
 
         Returns None
         """
-        truncate_sql, serial_key_sql = super(self.__class__, self).truncate(table)
+        truncate_sql, serial_key_sql = super(PostgresDbWriter, self).truncate(table)
         self.execute(truncate_sql)
         if serial_key_sql:
             self.execute(serial_key_sql)
@@ -148,7 +148,7 @@ class PostgresDbWriter(PostgresWriter):
 
         Returns None
         """
-        table_sql, serial_key_sql = super(self.__class__, self).write_table(table)
+        table_sql, serial_key_sql = super(PostgresDbWriter, self).write_table(table)
         for sql in serial_key_sql + table_sql:
             self.execute(sql)
 
@@ -161,7 +161,7 @@ class PostgresDbWriter(PostgresWriter):
 
         Returns None
         """
-        index_sql = super(self.__class__, self).write_indexes(table)
+        index_sql = super(PostgresDbWriter, self).write_indexes(table)
         for sql in index_sql:
             self.execute(sql)
 
@@ -174,7 +174,7 @@ class PostgresDbWriter(PostgresWriter):
 
         Returns None
         """
-        constraint_sql = super(self.__class__, self).write_constraints(table)
+        constraint_sql = super(PostgresDbWriter, self).write_constraints(table)
         for sql in constraint_sql:
             self.execute(sql)
 
