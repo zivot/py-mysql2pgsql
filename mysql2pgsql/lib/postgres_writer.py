@@ -121,7 +121,7 @@ class PostgresWriter(object):
                 row[index] = '1970-01-01 00:00:00'
             elif 'bit' in column_type:
                 row[index] = bin(ord(row[index]))[2:]
-            elif row[index].__class__ in (str, unicode):
+            elif isinstance(row[index], (str, unicode, basestring)):
                 if column_type == 'bytea':
                     row[index] = Binary(row[index]).getquoted()[1:-8] if row[index] else row[index]
                 elif 'text[' in column_type:
@@ -131,9 +131,9 @@ class PostgresWriter(object):
             elif column_type == 'boolean':
                 # We got here because you used a tinyint(1), if you didn't want a bool, don't use that type
                 row[index] = 't' if row[index] not in (None, 0) else 'f' if row[index] == 0 else row[index]
-            elif row[index].__class__ in (date, datetime):
+            elif isinstance(row[index], (date, datetime)):
                 row[index] = row[index].isoformat()
-            elif row[index].__class__ is timedelta:
+            elif isinstance(row[index], timedelta):
                 row[index] = datetime.utcfromtimestamp(row[index].total_seconds()).time().isoformat()
             else:
                 row[index] = AsIs(row[index]).getquoted()
