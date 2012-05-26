@@ -29,6 +29,7 @@ class PostgresDbWriter(PostgresWriter):
           - `verbose`: whether or not to log progress to :py:obj:`stdout`
         """
         def __init__(self, table, data, processor, verbose=False):
+            super(PostgresDbWriter, self).__init__()
             self.data = iter(data)
             self.table = table
             self.processor = processor
