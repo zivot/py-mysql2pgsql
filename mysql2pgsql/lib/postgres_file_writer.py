@@ -134,9 +134,9 @@ COPY "%(table_name)s" (%(column_names)s) FROM stdin;
             row = list(row)
             pr(table, row)
             try:
-                f_write('%s\n' % ('\t'.join(row)))
+                f_write(u'%s\n' % (u'\t'.join(row)))
             except UnicodeDecodeError:
-                f_write('%s\n' % ('\t'.join(row)).decode('utf-8'))
+                f_write(u'%s\n' % (u'\t'.join(r.decode('utf-8') for r in row)))
             if verbose:
                 if (i % 20000) == 0:
                     now = tt()

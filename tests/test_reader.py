@@ -31,7 +31,7 @@ class TestMysqlReader(unittest.TestCase):
             }
 
         if self.options.get('password', None):
-            self.args['passwd'] = self.options.get('password', None),
+            self.args['passwd'] = self.options.get('password', None)
 
         if self.options.get('socket', None):
             self.args['unix_socket'] = self.options['socket']

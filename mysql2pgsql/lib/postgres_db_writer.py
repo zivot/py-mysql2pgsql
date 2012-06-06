@@ -52,7 +52,7 @@ class PostgresDbWriter(PostgresWriter):
                 try:
                     return '%s\n' % ('\t'.join(row))
                 except UnicodeDecodeError:
-                    return '%s\n' % ('\t'.join(row)).decode('utf-8')
+                    return '%s\n' % ('\t'.join(r.decode('utf8') for r in row))
             finally:
                 if self.verbose:
                     if (self.idx % 20000) == 0:
