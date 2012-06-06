@@ -40,13 +40,13 @@ class TestMysqlReader(unittest.TestCase):
             self.args['port'] = self.options.get('port', 3306)
             self.args['compress'] = self.options.get('compress', True)
 
-        with open(os.path.join(os.path.dirname(__file__), 'schema.sql')) as sql:
-            self.sql = sql.read()
-            with closing(MySQLdb.connect(**self.args)) as conn:
-                with closing(conn.cursor()) as cur:
-                    for cmd in self.sql.split('-- SPLIT'):
-                        cur.execute(cmd)
-                        conn.commit()
+        # with open(os.path.join(os.path.dirname(__file__), 'schema.sql')) as sql:
+        #     self.sql = sql.read()
+        #     with closing(MySQLdb.connect(**self.args)) as conn:
+        #         with closing(conn.cursor()) as cur:
+        #             for cmd in self.sql.split('-- SPLIT'):
+        #                 cur.execute(cmd)
+        #                 conn.commit()
         self.reader = MysqlReader(self.options)
         self.type_to_pos = {
             'text': (21, 22),

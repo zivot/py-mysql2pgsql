@@ -8,6 +8,7 @@ install:
 script: nosetests
 before_script:
   - mysql -e 'create database mysql2pgsql;'
+  - mysql -u root mysql2pgsql < $HOME/philipsoutham/py-mysql2pgsql/tests/schema.sql
   - psql -c 'create database mysql2pgsql;' -U postgres
 env:
   - DB=mysql
