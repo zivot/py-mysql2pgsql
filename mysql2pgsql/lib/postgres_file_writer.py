@@ -21,6 +21,7 @@ class PostgresFileWriter(PostgresWriter):
     verbose = None
 
     def __init__(self, output_file, verbose=False):
+        super(PostgresFileWriter, self).__init__()
         self.verbose = verbose
         self.f = output_file
         self.f.write("""
@@ -40,7 +41,7 @@ SET client_min_messages = warning;
 
         Returns None
         """
-        truncate_sql, serial_key_sql = super(self.__class__, self).truncate(table)
+        truncate_sql, serial_key_sql = super(PostgresFileWriter, self).truncate(table)
         self.f.write("""
 -- TRUNCATE %(table_name)s;
 %(truncate_sql)s
@@ -61,7 +62,7 @@ SET client_min_messages = warning;
 
         Returns None
         """
-        table_sql, serial_key_sql = super(self.__class__, self).write_table(table)
+        table_sql, serial_key_sql = super(PostgresFileWriter, self).write_table(table)
         if serial_key_sql:
             self.f.write("""
 %(serial_key_sql)s
@@ -86,7 +87,7 @@ SET client_min_messages = warning;
 
         Returns None
         """
-        self.f.write('\n'.join(super(self.__class__, self).write_indexes(table)))
+        self.f.write('\n'.join(super(PostgresFileWriter, self).write_indexes(table)))
 
     @status_logger
     def write_constraints(self, table):
@@ -97,7 +98,7 @@ SET client_min_messages = warning;
 
         Returns None
         """
-        self.f.write('\n'.join(super(self.__class__, self).write_constraints(table)))
+        self.f.write('\n'.join(super(PostgresFileWriter, self).write_constraints(table)))
 
     @status_logger
     def write_contents(self, table, reader):
@@ -129,22 +130,22 @@ COPY "%(table_name)s" (%(column_names)s) FROM stdin;
             start_time = tt()
             prev_val_len = 0
             prev_row_count = 0
-        for i, row in enumerate(reader.read(table)):
+        for i, row in enumerate(reader.read(table), 1):
             row = list(row)
             pr(table, row)
             try:
-                f_write('%s\n' % ('\t'.join(row)))
+                f_write(u'%s\n' % (u'\t'.join(row)))
             except UnicodeDecodeError:
-                f_write('%s\n' % ('\t'.join(row)).decode('utf-8'))
+                f_write(u'%s\n' % (u'\t'.join(r.decode('utf-8') for r in row)))
             if verbose:
-                if ((i + 1) % 20000) == 0:
+                if (i % 20000) == 0:
                     now = tt()
                     elapsed = now - start_time
-                    val = '%.2f rows/sec [%s] ' % (((i + 1) - prev_row_count) / elapsed, (i + 1))
+                    val = '%.2f rows/sec [%s] ' % ((i - prev_row_count) / elapsed, i)
                     print_row_progress('%s%s' % (("\b" * prev_val_len), val))
                     prev_val_len = len(val) + 3
                     start_time = now
-                    prev_row_count = i + 1
+                    prev_row_count = i
 
         f_write("\\.\n\n")
         if verbose:

@@ -718,7 +718,7 @@ INSERT INTO `type_conversion_test_2` (`tct_1_id`, `foo`) VALUES (1, 'bar');
 
 -- SPLIT
 
-INSERT INTO `type_conversion_test_2` (`tct_1_id`, `foo`) VALUES (2, 'baz');
+INSERT INTO `type_conversion_test_2` (`tct_1_id`, `foo`) VALUES (2, 'special characters:čćžšđ');
 
 -- SPLIT
 

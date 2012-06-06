@@ -6,18 +6,21 @@ from datetime import datetime, date, timedelta
 
 from psycopg2.extensions import QuotedString, Binary, AsIs
 
-from .writer import Writer
 
-
-class PostgresWriter(Writer):
+class PostgresWriter(object):
     """Base class for :py:class:`mysql2pgsql.lib.postgres_file_writer.PostgresFileWriter`
     and :py:class:`mysql2pgsql.lib.postgres_db_writer.PostgresDbWriter`.
     """
+    def __init__(self):
+        self.column_types = {}
+
     def column_description(self, column):
         return '"%s" %s' % (column['name'], self.column_type_info(column))
 
     def column_type(self, column):
-        return self.column_type_info(column).split(" ")[0]
+        hash_key = hash(frozenset(column.items()))
+        self.column_types[hash_key] = self.column_type_info(column).split(" ")[0]
+        return self.column_types[hash_key]
 
     def column_type_info(self, column):
         """
@@ -110,14 +113,15 @@ class PostgresWriter(Writer):
         sending to PostgreSQL via the copy command
         """
         for index, column in enumerate(table.columns):
-            column_type = self.column_type(column)
+            hash_key = hash(frozenset(column.items()))
+            column_type = self.column_types[hash_key] if hash_key in self.column_types else self.column_type(column)
             if row[index] == None and ('timestamp' not in column_type or not column['default']):
                 row[index] = '\N'
             elif row[index] == None and column['default']:
                 row[index] = '1970-01-01 00:00:00'
             elif 'bit' in column_type:
                 row[index] = bin(ord(row[index]))[2:]
-            elif row[index].__class__ in (str, unicode):
+            elif isinstance(row[index], (str, unicode, basestring)):
                 if column_type == 'bytea':
                     row[index] = Binary(row[index]).getquoted()[1:-8] if row[index] else row[index]
                 elif 'text[' in column_type:
@@ -127,9 +131,9 @@ class PostgresWriter(Writer):
             elif column_type == 'boolean':
                 # We got here because you used a tinyint(1), if you didn't want a bool, don't use that type
                 row[index] = 't' if row[index] not in (None, 0) else 'f' if row[index] == 0 else row[index]
-            elif row[index].__class__ in (date, datetime):
+            elif isinstance(row[index], (date, datetime)):
                 row[index] = row[index].isoformat()
-            elif row[index].__class__ is timedelta:
+            elif isinstance(row[index], timedelta):
                 row[index] = datetime.utcfromtimestamp(row[index].total_seconds()).time().isoformat()
             else:
                 row[index] = AsIs(row[index]).getquoted()
