@@ -1,14 +1,13 @@
 from __future__ import with_statement, absolute_import
 
-import sys
 import time
 from contextlib import closing
 
 import psycopg2
-from psycopg2.extensions import QuotedString
 
 from . import print_row_progress, status_logger
 from .postgres_writer import PostgresWriter
+
 
 class PostgresDbWriter(PostgresWriter):
     """Class used to stream DDL and/or data
@@ -53,7 +52,7 @@ class PostgresDbWriter(PostgresWriter):
                 try:
                     return '%s\n' % ('\t'.join(row))
                 except UnicodeDecodeError:
-                    return '%s\n' % ('\t'.join(row)).decode('utf-8')
+                    return '%s\n' % ('\t'.join(r.decode('utf8') for r in row))
             finally:
                 if self.verbose:
                     if (self.idx % 20000) == 0:
@@ -69,8 +68,8 @@ class PostgresDbWriter(PostgresWriter):
         def read(self, *args, **kwargs):
             return self.readline(*args, **kwargs)
 
-
-    def __init__(self, db_options, verbose=False, *args, **kwargs):
+    def __init__(self, db_options, verbose=False):
+        super(PostgresDbWriter, self).__init__()
         self.verbose = verbose
         self.db_options = {
             'host': db_options['hostname'],
@@ -80,10 +79,10 @@ class PostgresDbWriter(PostgresWriter):
             'user': db_options['username'],
             }
         if ':' in db_options['database']:
-            self.db_options['database'], self.schema  = self.db_options['database'].split(':')
+            self.db_options['database'], self.schema = self.db_options['database'].split(':')
         else:
             self.schema = None
-        super(PostgresDbWriter, self).__init__(*args, **kwargs)
+
         self.open()
 
     def open(self):
@@ -116,7 +115,7 @@ class PostgresDbWriter(PostgresWriter):
                           table=table_name,
                           columns=columns
                           )
-    
+
         self.conn.commit()
 
     def close(self):
@@ -130,13 +129,13 @@ class PostgresDbWriter(PostgresWriter):
     @status_logger
     def truncate(self, table):
         """Send DDL to truncate the specified `table`
-        
+
         :Parameters:
           - `table`: an instance of a :py:class:`mysql2pgsql.lib.mysql_reader.MysqlReader.Table` object that represents the table to read/write.
 
         Returns None
         """
-        truncate_sql, serial_key_sql = super(self.__class__, self).truncate(table)
+        truncate_sql, serial_key_sql = super(PostgresDbWriter, self).truncate(table)
         self.execute(truncate_sql)
         if serial_key_sql:
             self.execute(serial_key_sql)
@@ -150,10 +149,10 @@ class PostgresDbWriter(PostgresWriter):
 
         Returns None
         """
-        table_sql, serial_key_sql = super(self.__class__, self).write_table(table)
+        table_sql, serial_key_sql = super(PostgresDbWriter, self).write_table(table)
         for sql in serial_key_sql + table_sql:
             self.execute(sql)
-        
+
     @status_logger
     def write_indexes(self, table):
         """Send DDL to create the specified `table` indexes
@@ -163,7 +162,7 @@ class PostgresDbWriter(PostgresWriter):
 
         Returns None
         """
-        index_sql = super(self.__class__, self).write_indexes(table)
+        index_sql = super(PostgresDbWriter, self).write_indexes(table)
         for sql in index_sql:
             self.execute(sql)
 
@@ -176,7 +175,7 @@ class PostgresDbWriter(PostgresWriter):
 
         Returns None
         """
-        constraint_sql = super(self.__class__, self).write_constraints(table)
+        constraint_sql = super(PostgresDbWriter, self).write_constraints(table)
         for sql in constraint_sql:
             self.execute(sql)
 

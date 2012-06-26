@@ -7,27 +7,28 @@ from datetime import datetime, date, timedelta
 from psycopg2.extensions import QuotedString, Binary, AsIs
 from pytz import timezone
 
-from .writer import Writer
 
-
-class PostgresWriter(Writer):
+class PostgresWriter(object):
     """Base class for :py:class:`mysql2pgsql.lib.postgres_file_writer.PostgresFileWriter`
     and :py:class:`mysql2pgsql.lib.postgres_db_writer.PostgresDbWriter`.
     """
     def __init__(self, tz=False):
+        self.column_types = {}
+
         if tz:
             self.tz = timezone('UTC')
             self.tz_offset = '+00:00'
         else:
             self.tz = None
             self.tz_offset = ''
-            
-    
+
     def column_description(self, column):
         return '"%s" %s' % (column['name'], self.column_type_info(column))
 
     def column_type(self, column):
-        return self.column_type_info(column).split(" ")[0]
+        hash_key = hash(frozenset(column.items()))
+        self.column_types[hash_key] = self.column_type_info(column).split(" ")[0]
+        return self.column_types[hash_key]
 
     def column_type_info(self, column):
         """
@@ -36,15 +37,14 @@ class PostgresWriter(Writer):
             return 'integer DEFAULT nextval(\'%s_%s_seq\'::regclass) NOT NULL' % (
                    column['table_name'], column['name'])
 
-        
         null = "" if column['null'] else " NOT NULL"
-        
+
         def get_type(column):
             """This in conjunction with :py:class:`mysql2pgsql.lib.mysql_reader.MysqlReader._convert_type`
             determines the PostgreSQL data type. In my opinion this is way too fugly, will need
             to refactor one day.
             """
-            def t(v): return not v == None
+            t = lambda v: not v == None
             default = (' DEFAULT %s' % QuotedString(column['default']).getquoted()) if t(column['default']) else None
 
             if column['type'] == 'char':
@@ -136,7 +136,8 @@ class PostgresWriter(Writer):
         sending to PostgreSQL via the copy command
         """
         for index, column in enumerate(table.columns):
-            column_type = self.column_type(column)
+            hash_key = hash(frozenset(column.items()))
+            column_type = self.column_types[hash_key] if hash_key in self.column_types else self.column_type(column)
             if row[index] == None and ('timestamp' not in column_type or not column['default']):
                 row[index] = '\N'
             elif row[index] == None and column['default']:
@@ -146,7 +147,7 @@ class PostgresWriter(Writer):
                     row[index] = '1970-01-01 00:00:00'
             elif 'bit' in column_type:
                 row[index] = bin(ord(row[index]))[2:]
-            elif row[index].__class__ in (str, unicode):
+            elif isinstance(row[index], (str, unicode, basestring)):
                 if column_type == 'bytea':
                     row[index] = Binary(row[index]).getquoted()[1:-8] if row[index] else row[index]
                 elif 'text[' in column_type:
@@ -154,9 +155,10 @@ class PostgresWriter(Writer):
                 else:
                     row[index] = row[index].replace('\\', r'\\').replace('\n', r'\n').replace('\t', r'\t').replace('\r', r'\r').replace('\0', '')
             elif column_type == 'boolean':
-                row[index] = 't' if row[index] == 1 else 'f' if row[index] == 0 else row[index]
-            elif row[index].__class__ in (date, datetime):
-                if row[index].__class__ == datetime and self.tz:
+                # We got here because you used a tinyint(1), if you didn't want a bool, don't use that type
+                row[index] = 't' if row[index] not in (None, 0) else 'f' if row[index] == 0 else row[index]
+            elif  isinstance(row[index], (date, datetime)):
+                if  isinstance(row[index], datetime) and self.tz:
                     try:
                         if row[index].tzinfo:
                             row[index] = row[index].astimezone(self.tz).isoformat()
@@ -167,7 +169,7 @@ class PostgresWriter(Writer):
                     # row[index] = row[index].isoformat()
                 else:
                     row[index] = row[index].isoformat()
-            elif row[index].__class__ is timedelta:
+            elif isinstance(row[index], timedelta):
                 row[index] = datetime.utcfromtimestamp(row[index].total_seconds()).time().isoformat()
             else:
                 row[index] = AsIs(row[index]).getquoted()
@@ -186,7 +188,6 @@ class PostgresWriter(Writer):
                 primary_keys.append(column['name'])
             columns.write('  %s,\n' % self.column_description(column))
         return primary_keys, serial_key, maxval, columns.getvalue()[:-2]
-
 
     def truncate(self, table):
         serial_key = None
@@ -244,7 +245,7 @@ class PostgresWriter(Writer):
                     'table_name': table.name,
                     'column_names': ', '.join('"%s"' % col for col in index['columns']),
                     })
-        
+
         return index_sql
 
     def write_constraints(self, table):

@@ -11,8 +11,9 @@ re_column_length = re.compile(r'\((\d+)\)')
 re_column_precision = re.compile(r'\((\d+),(\d+)\)')
 re_key_1 = re.compile(r'CONSTRAINT `(\w+)` FOREIGN KEY \(`(\w+)`\) REFERENCES `(\w+)` \(`(\w+)`\)')
 re_key_2 = re.compile(r'KEY `(\w+)` \((.*)\)')
-#re_key_3 = re.compile(r'PRIMARY KEY .*\((.*)\)')
 re_key_3 = re.compile(r'PRIMARY KEY \((.*)\)')
+
+
 class DB:
     """
     Class that wraps MySQLdb functions that auto reconnects
@@ -21,6 +22,7 @@ class DB:
     helper functions.
     """
     conn = None
+
     def __init__(self, options):
         args = {
             'user': options.get('username', 'root'),
@@ -42,7 +44,7 @@ class DB:
         self.options = args
 
     def connect(self):
-        self.conn =  MySQLdb.connect(**self.options)
+        self.conn = MySQLdb.connect(**self.options)
 
     def close(self):
         self.conn.close()
@@ -138,7 +140,7 @@ class MysqlReader(object):
                 res = self.reader.db.query('SELECT MAX(`%s`) FROM `%s`;' % (field['name'], self.name), one=True)
                 field['maxval'] = int(res[0]) if res[0] else 0
             return fields
-                
+
         def _load_indexes(self):
             explain = self.reader.db.query('SHOW CREATE TABLE `%s`' % self.name, one=True)
             explain = explain[1]
@@ -189,7 +191,7 @@ class MysqlReader(object):
             return 'SELECT %(column_names)s FROM `%(table_name)s`' % {
                 'table_name': self.name,
                 'column_names': ', '. join(("`%s`" % c['name']) for c in self.columns)}
-                
+
     def __init__(self, options):
         self.db = DB(options)
 

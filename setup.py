@@ -5,6 +5,7 @@ install_requires = [
     'mysql-python>=1.2.3', 
     'psycopg2>=2.4.2',
     'pyyaml>=3.10.0',
+    'argparse',
 ]
 
 if os.name == 'posix':
@@ -12,7 +13,7 @@ if os.name == 'posix':
     
 setup(
     name='py-mysql2pgsql',
-    version='0.1.3',
+    version='0.1.5',
     description='Tool for migrating/converting from mysql to postgresql.',
     long_description=open('README.rst').read(),
     license='MIT License',

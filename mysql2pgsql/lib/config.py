@@ -2,7 +2,7 @@ from __future__ import with_statement, absolute_import
 
 import os.path
 
-from yaml import load, dump
+from yaml import load
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -16,6 +16,7 @@ from .errors import ConfigurationFileInitialized,\
 class ConfigBase(object):
     def __init__(self, config_file_path):
         self.options = load(open(config_file_path))
+
 
 class Config(ConfigBase):
     def __init__(self, config_file_path, generate_if_not_found=True):
@@ -34,7 +35,7 @@ Please review the configuration and retry...""" % config_file_path)
     def reset_configfile(self, file_path):
         with open(file_path, 'w') as f:
             f.write(CONFIG_TEMPLATE)
-        
+
 CONFIG_TEMPLATE = """
 # if a socket is specified we will use that
 # if tcp is chosen you can use compression
