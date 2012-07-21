@@ -87,18 +87,17 @@ class PostgresWriter(object):
                 default = None
                 return default, 'date'
             elif column['type'] == 'timestamp':
-                if "CURRENT_TIMESTAMP" in column['default']:
+                if column['default'] == None:
+                    default = None
+                elif "CURRENT_TIMESTAMP" in column['default']:
                     default = ' DEFAULT CURRENT_TIMESTAMP'
-                if "0000-00-00 00:00" in  column['default']:
+                elif "0000-00-00 00:00" in  column['default']:
                     if self.tz:
                         default = " DEFAULT '1970-01-01T00:00:00.000000%s'" % self.tz_offset
+                    elif "0000-00-00 00:00:00" in column['default']:
+                        default = " DEFAULT '1970-01-01 00:00:00'"
                     else:
                         default = " DEFAULT '1970-01-01 00:00'"
-                if "0000-00-00 00:00:00" in column['default']:
-                    if self.tz:
-                        default = " DEFAULT '1970-01-01T00:00:00.000000%s'" % self.tz_offset
-                    else:
-                        default = " DEFAULT '1970-01-01 00:00:00'"
                 if self.tz:
                     return default, 'timestamp with time zone'
                 else:
