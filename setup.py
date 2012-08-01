@@ -6,6 +6,7 @@ install_requires = [
     'psycopg2>=2.4.2',
     'pyyaml>=3.10.0',
     'argparse',
+    'pytz',
 ]
 
 if os.name == 'posix':
@@ -33,7 +34,6 @@ setup(
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Topic :: Database',
         'Topic :: Utilities'
