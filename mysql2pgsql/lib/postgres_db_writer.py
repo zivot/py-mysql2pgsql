@@ -68,8 +68,8 @@ class PostgresDbWriter(PostgresWriter):
         def read(self, *args, **kwargs):
             return self.readline(*args, **kwargs)
 
-    def __init__(self, db_options, verbose=False):
-        super(PostgresDbWriter, self).__init__()
+    def __init__(self, db_options, verbose=False, *args, **kwargs):
+        super(PostgresDbWriter, self).__init__(*args, **kwargs)
         self.verbose = verbose
         self.db_options = {
             'host': db_options['hostname'],

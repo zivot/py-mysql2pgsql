@@ -166,7 +166,6 @@ class PostgresWriter(object):
                             row[index] = datetime(*row[index].timetuple()[:6], tzinfo=self.tz).isoformat()
                     except Exception as e:
                         print e.message
-                    # row[index] = row[index].isoformat()
                 else:
                     row[index] = row[index].isoformat()
             elif isinstance(row[index], timedelta):
