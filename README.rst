@@ -26,11 +26,12 @@ install. Might I suggest installing this in an virtualenv?
 Requirements:
 -------------
 
-* `Python 2.6 or 2.7 <http://www.python.org/getit/>`_
+* `Python 2.7 <http://www.python.org/getit/>`_
 * `MySQL-python <http://pypi.python.org/pypi/MySQL-python>`_
 * `psycopg2 <http://pypi.python.org/pypi/psycopg2>`_
 * `PyYAML <http://pypi.python.org/pypi/PyYAML>`_
 * `termcolor <http://pypi.python.org/pypi/termcolor>`_ (unless you're installing on windows)
+* `pytz <http://pypi.python.org/pypi/pytz>`_
 
 
 On Windows

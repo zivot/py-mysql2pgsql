@@ -20,8 +20,8 @@ class PostgresFileWriter(PostgresWriter):
     """
     verbose = None
 
-    def __init__(self, output_file, verbose=False):
-        super(PostgresFileWriter, self).__init__()
+    def __init__(self, output_file, verbose=False, *args, **kwargs):
+        super(PostgresFileWriter, self).__init__(*args, **kwargs)
         self.verbose = verbose
         self.f = output_file
         self.f.write("""

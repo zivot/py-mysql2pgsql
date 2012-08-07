@@ -88,37 +88,43 @@ class MysqlReader(object):
 
         def _convert_type(self, data_type):
             """Normalize MySQL `data_type`"""
-            if 'varchar' in data_type:
+            if data_type.startswith('varchar'):
                 return 'varchar'
-            elif 'char' in data_type:
+            elif data_type.startswith('char'):
                 return 'char'
             elif data_type in ('bit(1)', 'tinyint(1)', 'tinyint(1) unsigned'):
                 return 'boolean'
-            elif re.search(r'smallint.* unsigned', data_type) or 'mediumint' in data_type:
+            elif re.search(r'^smallint.* unsigned', data_type) or data_type.startswith('mediumint'):
                 return 'integer'
-            elif 'smallint' in data_type:
+            elif data_type.startswith('smallint'):
                 return 'tinyint'
-            elif 'tinyint' in data_type or 'year(' in data_type:
+            elif data_type.startswith('tinyint') or data_type.startswith('year('):
                 return 'tinyint'
-            elif 'bigint' in data_type and 'unsigned' in data_type:
+            elif data_type.startswith('bigint') and 'unsigned' in data_type:
                 return 'numeric'
-            elif re.search(r'int.* unsigned', data_type) or\
-                    ('bigint' in data_type and 'unsigned' not in data_type):
+            elif re.search(r'^int.* unsigned', data_type) or \
+                    (data_type.startswith('bigint') and 'unsigned' not in data_type):
                 return 'bigint'
-            elif 'int' in data_type:
+            elif data_type.startswith('int'):
                 return 'integer'
-            elif 'float' in data_type:
+            elif data_type.startswith('float'):
                 return 'float'
-            elif 'decimal' in data_type:
+            elif data_type.startswith('decimal'):
                 return 'decimal'
-            elif 'double' in data_type:
+            elif data_type.startswith('double'):
                 return 'double precision'
             else:
                 return data_type
 
         def _load_columns(self):
             fields = []
-            for res in self.reader.db.query('EXPLAIN `%s`' % self.name):
+            for row in self.reader.db.query('EXPLAIN `%s`' % self.name):
+                res = ()
+                for field in row:
+                  if type(field) == unicode:
+                    res += field.encode('utf8'),
+                  else:
+                    res += field,
                 length_match = re_column_length.search(res[1])
                 precision_match = re_column_precision.search(res[1])
                 length = length_match.group(1) if length_match else \

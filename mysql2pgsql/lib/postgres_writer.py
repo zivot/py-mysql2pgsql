@@ -87,18 +87,17 @@ class PostgresWriter(object):
                 default = None
                 return default, 'date'
             elif column['type'] == 'timestamp':
-                if "CURRENT_TIMESTAMP" in column['default']:
+                if column['default'] == None:
+                    default = None
+                elif "CURRENT_TIMESTAMP" in column['default']:
                     default = ' DEFAULT CURRENT_TIMESTAMP'
-                if "0000-00-00 00:00" in  column['default']:
+                elif "0000-00-00 00:00" in  column['default']:
                     if self.tz:
                         default = " DEFAULT '1970-01-01T00:00:00.000000%s'" % self.tz_offset
+                    elif "0000-00-00 00:00:00" in column['default']:
+                        default = " DEFAULT '1970-01-01 00:00:00'"
                     else:
                         default = " DEFAULT '1970-01-01 00:00'"
-                if "0000-00-00 00:00:00" in column['default']:
-                    if self.tz:
-                        default = " DEFAULT '1970-01-01T00:00:00.000000%s'" % self.tz_offset
-                    else:
-                        default = " DEFAULT '1970-01-01 00:00:00'"
                 if self.tz:
                     return default, 'timestamp with time zone'
                 else:
@@ -115,8 +114,9 @@ class PostgresWriter(object):
                 return default, 'text'
             elif re.search(r'^enum', column['type']):
                 default = (' %s::character varying' % default) if t(default) else None
-                enum = re.sub(r'enum|\(|\)', '', column['type'])
-                max_enum_size = max([(len(e) - 2) for e in enum.split(',')])
+                enum = re.sub(r'^enum|\(|\)', '', column['type'])
+                # TODO: will work for "'.',',',''''" but will fail for "'.'',','.'"
+                max_enum_size = max([len(e.replace("''", "'")) for e in enum.split("','")])
                 return default, ' character varying(%s) check(%s in (%s))' % (max_enum_size, column['name'], enum)
             elif 'bit(' in column['type']:
                 return ' DEFAULT %s' % column['default'].upper() if column['default'] else column['default'], 'varbit(%s)' % re.search(r'\((\d+)\)', column['type']).group(1)
@@ -166,7 +166,6 @@ class PostgresWriter(object):
                             row[index] = datetime(*row[index].timetuple()[:6], tzinfo=self.tz).isoformat()
                     except Exception as e:
                         print e.message
-                    # row[index] = row[index].isoformat()
                 else:
                     row[index] = row[index].isoformat()
             elif isinstance(row[index], timedelta):
@@ -221,7 +220,7 @@ class PostgresWriter(object):
             serial_key_sql.append('SELECT pg_catalog.setval(%s, %s, true);' % (QuotedString(serial_key_seq).getquoted(), maxval))
 
         table_sql.append('DROP TABLE IF EXISTS "%s" CASCADE;' % table.name)
-        table_sql.append('CREATE TABLE "%s" (\n%s\n)\nWITHOUT OIDS;' % (table.name, columns))
+        table_sql.append('CREATE TABLE "%s" (\n%s\n)\nWITHOUT OIDS;' % (table.name.encode('utf8'), columns))
         return (table_sql, serial_key_sql)
 
     def write_indexes(self, table):
