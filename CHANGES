@@ -1,12 +1,23 @@
 py-mysql2pgsql Changelog
 ========================
 
-Feature: use -t to convert date fields to UTC timezone.
+
+Version 0.1.6
+-------------
+
+- Feature: use -t to convert date fields to UTC timezone.
+- Data types detection corrected
+- Missed changes from timezone option support
+- Support NULL as timestamp default
+- Corrected enum chomping on braces and commas
+- Decode mysql table names so they can be internalized now
+
 
 Version 0.1.5
 -------------
 
 Support for Python 2.6 removed.
+
 
 Version 0.1.2
 -------------
