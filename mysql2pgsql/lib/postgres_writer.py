@@ -202,7 +202,7 @@ class PostgresWriter(object):
 
         if serial_key:
             serial_key_sql = "SELECT pg_catalog.setval(pg_get_serial_sequence(%(table_name)s, %(serial_key)s), %(maxval)s, true);" % {
-                'table_name': QuotedString(table.name).getquoted(),
+                'table_name': QuotedString('"%s"' % table.name).getquoted(),
                 'serial_key': QuotedString(serial_key).getquoted(),
                 'maxval': maxval}
 
