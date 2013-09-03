@@ -110,7 +110,7 @@ class PostgresWriter(object):
                 return default, 'text'
             elif re.search(r'^enum', column['type']):
                 default = (' %s::character varying' % default) if t(default) else None
-                enum = re.sub(r'^enum|\(|\)', '', column['type'])
+                enum = re.sub(r'^enum\(|\)$', '', column['type'])
                 # TODO: will work for "'.',',',''''" but will fail for "'.'',','.'"
                 max_enum_size = max([len(e.replace("''", "'")) for e in enum.split("','")])
                 return default, ' character varying(%s) check(%s in (%s))' % (max_enum_size, column['name'], enum)
