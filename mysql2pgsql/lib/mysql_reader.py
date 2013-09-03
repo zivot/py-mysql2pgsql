@@ -129,22 +129,27 @@ class MysqlReader(object):
                 precision_match = re_column_precision.search(res[1])
                 length = length_match.group(1) if length_match else \
                     precision_match.group(1) if precision_match else None
+                name = res[0]
+                field_type = self._convert_type(res[1])
                 desc = {
-                    'name': res[0],
+                    'name': name,
                     'table_name': self.name,
-                    'type': self._convert_type(res[1]),
+                    'type': field_type,
                     'length': int(length) if length else None,
                     'decimals': precision_match.group(2) if precision_match else None,
                     'null': res[2] == 'YES',
                     'primary_key': res[3] == 'PRI',
                     'auto_increment': res[5] == 'auto_increment',
                     'default': res[4] if not res[4] == 'NULL' else None,
+                    'select': '`%s`' % name if not re.search(r'^enum', field_type) else
+                        'CASE `%(name)s` WHEN "" THEN NULL ELSE `%(name)s` END' % {'name': name},
                     }
                 fields.append(desc)
 
             for field in (f for f in fields if f['auto_increment']):
                 res = self.reader.db.query('SELECT MAX(`%s`) FROM `%s`;' % (field['name'], self.name), one=True)
                 field['maxval'] = int(res[0]) if res[0] else 0
+
             return fields
 
         def _load_indexes(self):
@@ -196,7 +201,7 @@ class MysqlReader(object):
         def query_for(self):
             return 'SELECT %(column_names)s FROM `%(table_name)s`' % {
                 'table_name': self.name,
-                'column_names': ', '. join(("`%s`" % c['name']) for c in self.columns)}
+                'column_names': ', '. join(c['select'] for c in self.columns)}
 
     def __init__(self, options):
         self.db = DB(options)
