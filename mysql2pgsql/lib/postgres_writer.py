@@ -104,19 +104,19 @@ class PostgresWriter(object):
                     return default, 'time with time zone'
                 else:
                     return default, 'time without time zone'
-            elif 'blob' in column['type'] or 'binary' in column['type']:
+            elif column['type'] in ('blob', 'binary', 'varbinary'):
                 return default, 'bytea'
             elif column['type'] in ('tinytext', 'mediumtext', 'longtext', 'text'):
                 return default, 'text'
-            elif re.search(r'^enum', column['type']):
+            elif column['type'].startswith('enum'):
                 default = (' %s::character varying' % default) if t(default) else None
                 enum = re.sub(r'^enum\(|\)$', '', column['type'])
                 # TODO: will work for "'.',',',''''" but will fail for "'.'',','.'"
                 max_enum_size = max([len(e.replace("''", "'")) for e in enum.split("','")])
                 return default, ' character varying(%s) check(%s in (%s))' % (max_enum_size, column['name'], enum)
-            elif 'bit(' in column['type']:
+            elif column['type'].startswith('bit('):
                 return ' DEFAULT %s' % column['default'].upper() if column['default'] else column['default'], 'varbit(%s)' % re.search(r'\((\d+)\)', column['type']).group(1)
-            elif 'set(' in column['type']:
+            elif column['type'].startswith('set('):
                 if default:
                     default = ' DEFAULT ARRAY[%s]::text[]' % ','.join(QuotedString(v).getquoted() for v in re.search(r"'(.*)'", default).group(1).split(','))
                 return default, 'text[]'

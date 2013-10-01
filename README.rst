@@ -251,6 +251,16 @@ set                  ARRAY[]::text[]
 ==================== ===========================================
 
 
+Conversion caveats:
+===================
+
+Not just any valid MySQL database schema can be simply converted to the
+PostgreSQL. So when you end with a different database schema please note that:
+
+* Most MySQL versions don't enforce `NOT NULL` constraint on `date` and `enum`
+  feilds. Because of that `NOT NULL` is skipped for this types. Here's an
+  excuse for the dates: `<http://bugs.mysql.com/bug.php?id=59526>`_.
+
 About:
 ======
 
