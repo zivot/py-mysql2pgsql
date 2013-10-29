@@ -137,7 +137,7 @@ class MysqlReader(object):
                     'type': field_type,
                     'length': int(length) if length else None,
                     'decimals': precision_match.group(2) if precision_match else None,
-                    'null': res[2] == 'YES' and not (field_type.startswith('enum') or field_type in ('date', 'datetime', 'time', 'timestamp')),
+                    'null': res[2] == 'YES' or field_type.startswith('enum') or field_type in ('date', 'datetime', 'timestamp'),
                     'primary_key': res[3] == 'PRI',
                     'auto_increment': res[5] == 'auto_increment',
                     'default': res[4] if not res[4] == 'NULL' else None,
