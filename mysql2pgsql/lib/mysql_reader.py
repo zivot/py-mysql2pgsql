@@ -3,6 +3,7 @@ from __future__ import with_statement, absolute_import
 import re
 from contextlib import closing
 
+from pprint import pprint
 import MySQLdb
 import MySQLdb.cursors
 
@@ -83,8 +84,10 @@ class MysqlReader(object):
             self._name = name
             self._indexes = []
             self._foreign_keys = []
+            self._triggers = []
             self._columns = self._load_columns()
             self._load_indexes()
+            self._load_triggers()
 
         def _convert_type(self, data_type):
             """Normalize MySQL `data_type`"""
@@ -181,6 +184,20 @@ class MysqlReader(object):
                     self._indexes.append(index)
                     continue
 
+        def _load_triggers(self):
+            explain = self.reader.db.query('SHOW TRIGGERS WHERE `table` = \'%s\'' % self.name, one=True)
+            if type(explain) is tuple:
+                trigger = {}
+                trigger['name'] = explain[0]
+                trigger['event'] = explain[1]
+                trigger['statement'] = explain[3]
+                trigger['timing'] = explain[4]
+
+                trigger['statement'] = re.sub('^BEGIN', '', trigger['statement'])
+                trigger['statement'] = re.sub('^END', '', trigger['statement'], flags=re.MULTILINE)
+
+                self._triggers.append(trigger)
+
         @property
         def name(self):
             return self._name
@@ -196,6 +213,10 @@ class MysqlReader(object):
         @property
         def foreign_keys(self):
             return self._foreign_keys
+
+        @property
+        def triggers(self):
+            return self._triggers
 
         @property
         def query_for(self):

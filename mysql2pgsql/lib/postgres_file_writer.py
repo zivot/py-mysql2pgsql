@@ -101,6 +101,17 @@ SET client_min_messages = warning;
         self.f.write('\n'.join(super(PostgresFileWriter, self).write_constraints(table)))
 
     @status_logger
+    def write_triggers(self, table):
+        """Write TRIGGERs existing on `table` to the output file
+
+        :Parameters:
+          - `table`: an instance of a :py:class:`mysql2pgsql.lib.mysql_reader.MysqlReader.Table` object that represents the table to read/write.
+
+        Returns None
+        """
+        self.f.write('\n'.join(super(PostgresFileWriter, self).write_triggers(table)))
+
+    @status_logger
     def write_contents(self, table, reader):
         """Write the data contents of `table` to the output file.
 
