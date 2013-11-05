@@ -185,18 +185,21 @@ class MysqlReader(object):
                     continue
 
         def _load_triggers(self):
-            explain = self.reader.db.query('SHOW TRIGGERS WHERE `table` = \'%s\'' % self.name, one=True)
-            if type(explain) is tuple:
-                trigger = {}
-                trigger['name'] = explain[0]
-                trigger['event'] = explain[1]
-                trigger['statement'] = explain[3]
-                trigger['timing'] = explain[4]
+            explain = self.reader.db.query('SHOW TRIGGERS WHERE `table` = \'%s\'' % self.name)
+            for row in explain:
+                pprint(row)
+                if type(row) is tuple:
+                    trigger = {}
+                    trigger['name'] = row[0]
+                    trigger['event'] = row[1]
+                    trigger['statement'] = row[3]
+                    trigger['timing'] = row[4]
 
-                trigger['statement'] = re.sub('^BEGIN', '', trigger['statement'])
-                trigger['statement'] = re.sub('^END', '', trigger['statement'], flags=re.MULTILINE)
+                    trigger['statement'] = re.sub('^BEGIN', '', trigger['statement'])
+                    trigger['statement'] = re.sub('^END', '', trigger['statement'], flags=re.MULTILINE)
+                    trigger['statement'] = re.sub('`', '', trigger['statement'])
 
-                self._triggers.append(trigger)
+                    self._triggers.append(trigger)
 
         @property
         def name(self):
