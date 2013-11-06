@@ -3,7 +3,6 @@ from __future__ import with_statement, absolute_import
 import re
 from contextlib import closing
 
-from pprint import pprint
 import MySQLdb
 import MySQLdb.cursors
 
@@ -99,7 +98,7 @@ class MysqlReader(object):
                 return 'boolean'
             elif re.search(r'^smallint.* unsigned', data_type) or data_type.startswith('mediumint'):
                 return 'integer'
-            elif data_type.startswith('smallint'):
+            elif data_type.startswith('smallint') or data_type.startswith('binary('):
                 return 'tinyint'
             elif data_type.startswith('tinyint') or data_type.startswith('year('):
                 return 'tinyint'
@@ -187,7 +186,6 @@ class MysqlReader(object):
         def _load_triggers(self):
             explain = self.reader.db.query('SHOW TRIGGERS WHERE `table` = \'%s\'' % self.name)
             for row in explain:
-                pprint(row)
                 if type(row) is tuple:
                     trigger = {}
                     trigger['name'] = row[0]

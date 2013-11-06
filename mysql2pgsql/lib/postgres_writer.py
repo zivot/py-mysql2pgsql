@@ -4,7 +4,6 @@ import re
 from cStringIO import StringIO
 from datetime import datetime, date, timedelta
 
-from pprint import pprint
 from psycopg2.extensions import QuotedString, Binary, AsIs
 from pytz import timezone
 
@@ -284,7 +283,6 @@ class PostgresWriter(object):
                 'trigger_event': key['event'],
                 'trigger_name': key['name']})
 
-        print trigger_sql
         return trigger_sql
 
     def close(self):
