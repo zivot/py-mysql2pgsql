@@ -5,13 +5,15 @@ install_requires = [
     'mysql-python>=1.2.3', 
     'psycopg2>=2.4.2',
     'pyyaml>=3.10.0',
-    'argparse',
     'pytz',
 ]
 
 if os.name == 'posix':
     install_requires.append('termcolor>=1.1.0')
     
+if version < (2,7) or (3,0) <= version <= (3,1):
+    install_requires += ['argparse']
+
 setup(
     name='py-mysql2pgsql',
     version='0.1.6',
