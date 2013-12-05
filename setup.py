@@ -1,4 +1,5 @@
 import os
+import sys
 from setuptools import setup
 
 install_requires = [
@@ -10,7 +11,9 @@ install_requires = [
 
 if os.name == 'posix':
     install_requires.append('termcolor>=1.1.0')
-    
+
+version = sys.version_info[:2]
+
 if version < (2,7) or (3,0) <= version <= (3,1):
     install_requires += ['argparse']
 
