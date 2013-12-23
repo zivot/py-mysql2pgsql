@@ -259,6 +259,32 @@ class PostgresWriter(object):
                 'ref_column_name': key['ref_column']})
         return constraint_sql
 
+    def write_triggers(self, table):
+        trigger_sql = []
+        for key in table.triggers:
+            trigger_sql.append("""CREATE OR REPLACE FUNCTION %(fn_trigger_name)s RETURNS TRIGGER AS $%(trigger_name)s$
+            BEGIN
+                %(trigger_statement)s
+            RETURN NULL;
+            END;
+            $%(trigger_name)s$ LANGUAGE plpgsql;""" % {
+                'table_name': table.name,
+                'trigger_time': key['timing'],
+                'trigger_event': key['event'],
+                'trigger_name': key['name'],
+                'fn_trigger_name': 'fn_' + key['name'] + '()',
+                'trigger_statement': key['statement']})
+
+            trigger_sql.append("""CREATE TRIGGER %(trigger_name)s %(trigger_time)s %(trigger_event)s ON %(table_name)s
+            FOR EACH ROW
+            EXECUTE PROCEDURE fn_%(trigger_name)s();""" % {
+                'table_name': table.name,
+                'trigger_time': key['timing'],
+                'trigger_event': key['event'],
+                'trigger_name': key['name']})
+
+        return trigger_sql
+
     def close(self):
         raise NotImplementedError
 

@@ -83,8 +83,10 @@ class MysqlReader(object):
             self._name = name
             self._indexes = []
             self._foreign_keys = []
+            self._triggers = []
             self._columns = self._load_columns()
             self._load_indexes()
+            self._load_triggers()
 
         def _convert_type(self, data_type):
             """Normalize MySQL `data_type`"""
@@ -181,6 +183,22 @@ class MysqlReader(object):
                     self._indexes.append(index)
                     continue
 
+        def _load_triggers(self):
+            explain = self.reader.db.query('SHOW TRIGGERS WHERE `table` = \'%s\'' % self.name)
+            for row in explain:
+                if type(row) is tuple:
+                    trigger = {}
+                    trigger['name'] = row[0]
+                    trigger['event'] = row[1]
+                    trigger['statement'] = row[3]
+                    trigger['timing'] = row[4]
+
+                    trigger['statement'] = re.sub('^BEGIN', '', trigger['statement'])
+                    trigger['statement'] = re.sub('^END', '', trigger['statement'], flags=re.MULTILINE)
+                    trigger['statement'] = re.sub('`', '', trigger['statement'])
+
+                    self._triggers.append(trigger)
+
         @property
         def name(self):
             return self._name
@@ -196,6 +214,10 @@ class MysqlReader(object):
         @property
         def foreign_keys(self):
             return self._foreign_keys
+
+        @property
+        def triggers(self):
+            return self._triggers
 
         @property
         def query_for(self):

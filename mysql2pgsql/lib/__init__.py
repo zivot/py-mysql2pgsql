@@ -51,6 +51,7 @@ def status_logger(f):
     constraints_template = 'ADDING CONSTRAINTS ON %s'
     write_contents_template = 'WRITING DATA TO %s'
     index_template = 'ADDING INDEXES TO %s'
+    trigger_template = 'ADDING TRIGGERS TO %s'
     statuses = {
         'truncate': {
             'start': start_template % truncate_template,
@@ -71,6 +72,10 @@ def status_logger(f):
         'write_indexes': {
             'start': start_template % index_template,
             'finish': finish_template % index_template,
+            },
+        'write_triggers': {
+            'start': start_template % trigger_template,
+            'finish': finish_template % trigger_template,
             },
     }
 

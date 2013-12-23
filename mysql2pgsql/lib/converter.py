@@ -55,7 +55,7 @@ class Converter(object):
 
         if not self.supress_ddl:
             if self.verbose:
-                print_start_table('START CREATING INDEXES AND CONSTRAINTS')
+                print_start_table('START CREATING INDEXES, CONSTRAINTS, AND TRIGGERS')
 
             for table in tables:
                 self.writer.write_indexes(table)
@@ -63,8 +63,11 @@ class Converter(object):
             for table in tables:
                 self.writer.write_constraints(table)
 
+            for table in tables:
+                self.writer.write_triggers(table)
+
             if self.verbose:
-                print_start_table('DONE CREATING INDEXES AND CONSTRAINTS')
+                print_start_table('DONE CREATING INDEXES, CONSTRAINTS, AND TRIGGERS')
 
         if self.verbose:
             print_start_table('\n\n>>>>>>>>>> FINISHED <<<<<<<<<<')
