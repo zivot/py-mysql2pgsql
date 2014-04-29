@@ -113,7 +113,7 @@ class PostgresWriter(object):
                 enum = re.sub(r'^enum\(|\)$', '', column['type'])
                 # TODO: will work for "'.',',',''''" but will fail for "'.'',','.'"
                 max_enum_size = max([len(e.replace("''", "'")) for e in enum.split("','")])
-                return default, ' character varying(%s) check(%s in (%s))' % (max_enum_size, column['name'], enum)
+                return default, ' character varying(%s) check("%s" in (%s))' % (max_enum_size, column['name'], enum)
             elif column['type'].startswith('bit('):
                 return ' DEFAULT %s' % column['default'].upper() if column['default'] else column['default'], 'varbit(%s)' % re.search(r'\((\d+)\)', column['type']).group(1)
             elif column['type'].startswith('set('):
