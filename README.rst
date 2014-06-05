@@ -96,7 +96,7 @@ Don't worry if this is your first time, it'll be gentle.
     A new file has been initialized at: mysql2pgsql.yml
     Please review the configuration and retry...
 
-As the output suggests, I file was created at mysql2pgsql.yml for you
+As the output suggests, a file was created at mysql2pgsql.yml for you
 to edit. For the impatient, here is what the file contains.
 
 ::
@@ -174,7 +174,7 @@ on. Here's an example.
 
 ::
 
-    > py-mysql2pgsql -v -f mysql2pgsql
+    > py-mysql2pgsql -v -f mysql2pgsql.yml
     START PROCESSING table_one
       START  - CREATING TABLE table_one
       FINISH - CREATING TABLE table_one
