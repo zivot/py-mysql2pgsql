@@ -85,7 +85,7 @@ Looking for help?
       -f FILE, --file FILE  Location of configuration file (default:
                             mysql2pgsql.yml). If none exists at that path,
                             one will be created for you.
-                        
+
 
 Don't worry if this is your first time, it'll be gentle.
 
@@ -101,8 +101,11 @@ to edit. For the impatient, here is what the file contains.
 
 ::
 
-    # if a socket is specified we will use that
-    # if tcp is chosen you can use compression
+    # a socket connection will be selected if a 'socket' is specified
+    # also 'localhost' is a special 'hostname' for MySQL that overrides the 'port' option
+    # and forces it to use a local socket connection
+    # if tcp is chosen, you can use compression
+
     mysql:
      hostname: localhost
      port: 3306

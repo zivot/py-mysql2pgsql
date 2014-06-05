@@ -37,8 +37,11 @@ Please review the configuration and retry...""" % config_file_path)
             f.write(CONFIG_TEMPLATE)
 
 CONFIG_TEMPLATE = """
-# if a socket is specified we will use that
-# if tcp is chosen you can use compression
+# a socket connection will be selected if a 'socket' is specified
+# also 'localhost' is a special 'hostname' for MySQL that overrides the 'port' option
+# and forces it to use a local socket connection
+# if tcp is chosen, you can use compression
+
 mysql:
  hostname: localhost
  port: 3306
