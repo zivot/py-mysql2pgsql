@@ -141,7 +141,9 @@ to edit. For the impatient, here is what the file contains.
 
     # if timezone is true, forces to append/convert to UTC tzinfo mysql data
     timezone: false
-
+    
+    # if index_prefix is given, indexes will be created whith a name prefixed with index_prefix
+    index_prefix:
 
 Pretty self explainitory right? A couple things to note, first if
 `destination -> file` is populated all output will be dumped to the
@@ -166,6 +168,10 @@ Note that when migrating, it's sometimes possible to knock your
 sequences out of whack. When this happens, you may get IntegrityErrors 
 about your primary keys saying things like, "duplicate key value violates 
 unique constraint." See `this page <https://wiki.postgresql.org/wiki/Fixing_Sequences>`_ for a fix
+
+Due to different naming conventions in mysql an postgrsql, there is a chance
+that the tool generates index names that collide with table names. This can
+be circumvented by setting index_prefix.
 
 One last thing, the `--verbose` flag. Without it the tool will just go
 on it's merry way without bothering you with any output until it's
