@@ -140,7 +140,7 @@ class PostgresWriter(object):
         return comments.getvalue() 
 
     def column_comment(self, tablename, column):
-      if not column['comment']: 
+      if column['comment']: 
         return (' COMMENT ON COLUMN %s.%s is %s;' % ( tablename, column['name'], QuotedString(column['comment']).getquoted()))
       else: 
         return ''
