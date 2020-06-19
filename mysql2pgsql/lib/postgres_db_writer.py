@@ -78,6 +78,10 @@ class PostgresDbWriter(PostgresWriter):
             'password': str(db_options.get('password', None)) or '',
             'user': str(db_options['username']),
             }
+        if 'sslmode' in db_options:
+            self.db_options['sslmode'] = str(db_options['sslmode'])
+        if 'sslrootcert' in db_options:
+            self.db_options['sslrootcert'] = str(db_options['sslrootcert'])
         if ':' in str(db_options['database']):
             self.db_options['database'], self.schema = self.db_options['database'].split(':')
         else:
@@ -103,6 +107,7 @@ class PostgresDbWriter(PostgresWriter):
 
     def execute(self, sql, args=(), many=False):
         with closing(self.conn.cursor()) as cur:
+            print(sql + '\n')
             if many:
                 cur.executemany(sql, args)
             else:
